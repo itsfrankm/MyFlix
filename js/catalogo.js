@@ -1,7 +1,35 @@
 import { categories } from "./data.js";
 import { createCarousel } from "./components/Carousel.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+export function initCatalogPage(signal) {
+  const listenerOpts = signal ? { signal } : undefined;
+  const inPagesFolder = window.location.pathname.includes("/pages/");
+  const assetPrefix = inPagesFolder ? "../assets/images/" : "assets/images/";
+
+  const normalizeProfileImg = (src) => {
+    if (!src) return assetPrefix + "Convidado.jpg";
+    if (/^(?:https?:\/\/[^/]+)?\/?(?:pictures|Pictures)\//.test(src)) {
+      return (
+        assetPrefix +
+        src.replace(/^(?:https?:\/\/[^/]+)?\/?(?:pictures|Pictures)\//, "")
+      );
+    }
+    if (src.includes("assets/images/")) {
+      return assetPrefix + src.split("assets/images/")[1];
+    }
+    return src;
+  };
+
+  const brandLink = document.querySelector(".brand");
+  if (brandLink) {
+    brandLink.addEventListener("click", (e) => {
+      if (typeof window.__MYFLIX_NAVIGATE__ === "function") {
+        e.preventDefault();
+        window.__MYFLIX_NAVIGATE__("profiles");
+      }
+    });
+  }
+
   const nomePerfil = localStorage.getItem("perfilAtivoNome");
   const imagemPerfil = localStorage.getItem("perfilAtivoImagem");
 
@@ -10,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const profileIcon = document.querySelector(".profile-icon");
 
     if (kidsLink) kidsLink.textContent = nomePerfil;
-    if (profileIcon) profileIcon.src = imagemPerfil;
+    if (profileIcon) profileIcon.src = normalizeProfileImg(imagemPerfil);
   }
 
   // inicializa lista de perfis (caso queira alternar direto do catálogo)
@@ -21,8 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const kidsLinkEl = document.querySelector(".kids-link");
   if (profiles && profiles.length) {
     const idx = Number(localStorage.getItem("perfilAtivoIndex")) || 0;
-    if (profileIcon) profileIcon.src = profiles[idx].img;
-    if (kidsLinkEl) kidsLinkEl.textContent = profiles[idx].name;
+    const activeProfile = profiles[idx] || profiles[0];
+    if (profileIcon) profileIcon.src = normalizeProfileImg(activeProfile.img);
+    if (kidsLinkEl) kidsLinkEl.textContent = activeProfile.name;
   }
 
   function toggleProfileDropdownCatalog() {
@@ -33,11 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
     dd.style.position = "absolute";
     dd.style.right = "18px";
     dd.style.top = "60px";
-    dd.style.background = "rgba(12,12,12,0.98)";
-    dd.style.border = "1px solid rgba(255,255,255,0.06)";
     dd.style.padding = "10px";
     dd.style.borderRadius = "10px";
-    dd.style.boxShadow = "0 8px 30px rgba(0,0,0,0.6)";
     dd.style.zIndex = 4500;
     dd.style.minWidth = "220px";
     dd.innerHTML = (
@@ -48,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(
         (p, i) => `
       <div class="profiles-dropdown-item" data-idx="${i}" style="display:flex;gap:10px;align-items:center;padding:8px;border-radius:6px;cursor:pointer">
-        <img src="${p.img}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.06)" />
+        <img src="${normalizeProfileImg(p.img)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,0.06)" />
         <div style="flex:1">${p.name}</div>
       </div>
     `,
@@ -63,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.setItem("perfilAtivoIndex", String(i));
           localStorage.setItem("perfilAtivoNome", profiles[i].name);
           localStorage.setItem("perfilAtivoImagem", profiles[i].img);
-          if (profileIcon) profileIcon.src = profiles[i].img;
+          if (profileIcon) profileIcon.src = normalizeProfileImg(profiles[i].img);
           if (kidsLinkEl) kidsLinkEl.textContent = profiles[i].name;
         }
         dd.remove();
@@ -76,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (!dd.contains(e.target) && e.target !== profileMenuBtn)
             dd.remove();
         },
-        { once: true },
+        signal ? { once: true, signal } : { once: true },
       );
     }, 10);
   }
@@ -122,15 +148,27 @@ document.addEventListener("DOMContentLoaded", () => {
         toast.className = "welcome-toast";
         toast.innerHTML = `<span>🎁</span><span>Bem-vindo, ${nomePerfil}!</span>`;
         document.body.appendChild(toast);
-        setTimeout(() => {
+        const fadeTimer = setTimeout(() => {
           toast.style.opacity = "0";
           toast.style.transition = "opacity 0.6s";
         }, 4000);
+        const removeTimer = setTimeout(() => toast.remove(), 4700);
+        if (signal) {
+          signal.addEventListener(
+            "abort",
+            () => {
+              clearTimeout(fadeTimer);
+              clearTimeout(removeTimer);
+              toast.remove();
+            },
+            { once: true },
+          );
+        }
       }
     }
 
     categories.forEach((category) => {
-      const carousel = createCarousel(category);
+      const carousel = createCarousel(category, signal);
       container.appendChild(carousel);
     });
   }
@@ -138,13 +176,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Glassmorphism navbar ao rolar
   const navbar = document.getElementById("navbar");
   if (navbar) {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 10) {
-        navbar.classList.add("scrolled");
-      } else {
-        navbar.classList.remove("scrolled");
-      }
-    });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (window.scrollY > 10) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      },
+      listenerOpts,
+    );
   }
 
   // notifications toggle on catalog page
@@ -165,12 +207,20 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
       toggle();
     });
-    document.addEventListener("click", (e) => {
-      if (!notif.contains(e.target)) toggle(false);
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") toggle(false);
-    });
+    document.addEventListener(
+      "click",
+      (e) => {
+        if (!notif.contains(e.target)) toggle(false);
+      },
+      listenerOpts,
+    );
+    document.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key === "Escape") toggle(false);
+      },
+      listenerOpts,
+    );
   }
 
   // theme toggle on catalog page
@@ -196,4 +246,12 @@ document.addEventListener("DOMContentLoaded", () => {
       ? '<i class="fas fa-sun"></i>'
       : '<i class="fas fa-moon"></i>';
   }
-});
+}
+
+if (!window.__MYFLIX_APP__) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => initCatalogPage());
+  } else {
+    initCatalogPage();
+  }
+}

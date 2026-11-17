@@ -1,4 +1,4 @@
-/* Estilos para layout de 4 perfis (pasta Pictures)
+/* Estilos para layout de 4 perfis (pasta assets/images)
    Comentários foram adicionados linha a linha para facilitar releitura futura. */
 
 /* Importa a família de fontes Montserrat do Google Fonts */
@@ -11,7 +11,9 @@
 
 :root {
   /* Variáveis CSS: caminho padrão para imagem de fundo (pode ser substituído) */
-  --bg-image: url("pictures/Wallpaper.jpg");
+  --bg-image: url("../assets/images/Wallpaper.jpg");
+  --Myflix-red: #e50914;
+  --netflix-red: #e50914;
 }
 
 /* Estilos globais do body */
@@ -33,15 +35,16 @@ body {
   background-position: center; /* Centraliza a imagem de fundo */
   background-repeat: no-repeat; /* Evita repetição da imagem */
   -webkit-font-smoothing: antialiased; /* Suaviza a renderização da fonte em WebKit */
+  -moz-osx-font-smoothing: grayscale; /* Suaviza a renderização da fonte no Firefox/macOS */
   text-rendering: optimizeLegibility; /* Melhora legibilidade do texto */
 }
 
 /* Ajuste do main para contraste sobre fundo escuro e centralização vertical/ horizontal */
 main {
   max-width: 980px; /* Largura máxima do conteúdo principal */
-  margin: 36px auto; /* Centraliza horizontalmente e aplica margem superior */
-  padding: 0 16px; /* Espaçamento interno lateral */
-  min-height: calc(100vh - 72px); /* Altura mínima considerando o header */
+  margin: 0 auto; /* Centraliza horizontalmente sem gerar scroll vertical extra */
+  padding: 32px 20px; /* Espaçamento interno */
+  min-height: calc(100vh - 68px); /* Altura mínima considerando o header */
   display: flex; /* Usa flexbox para alinhar conteúdo */
   flex-direction: column; /* Elementos empilhados verticalmente */
   align-items: center; /* Centro horizontal dos filhos */
@@ -49,11 +52,16 @@ main {
   color: #fff; /* Garante texto branco dentro do main */
 }
 
+figure {
+  margin: 0; /* Remove margem padrão do navegador em figure */
+}
+
 /* Estilo do título principal */
-h1 {
-  font-size: 1.6rem; /* Tamanho do texto do h1 */
+h1,
+#profiles-title {
+  font-size: clamp(1.5rem, 3vw, 2.2rem); /* Tamanho fluido do título */
   text-align: center; /* Centraliza o texto */
-  margin-bottom: 24px; /* Espaçamento abaixo do título */
+  margin: 0 0 28px 0; /* Espaçamento abaixo do título */
 }
 
 /* Grid que organiza os perfis */
@@ -68,7 +76,7 @@ h1 {
 /* A lista ordenada interna é o grid que organiza os perfis */
 .Profiles .Profiles-list {
   display: grid; /* Usa grid layout */
-  grid-template-columns: repeat(4, 1fr); /* 4 colunas proporcionais */
+  grid-template-columns: repeat(var(--profile-cols, 4), 1fr); /* Colunas proporcionais */
   gap: 18px; /* Espaço entre itens do grid */
   align-items: start; /* Alinha itens ao topo */
   justify-items: center; /* Centraliza conteúdo internamente em cada célula */
@@ -110,7 +118,7 @@ h1 {
 
 /* Texto secundário dentro do perfil (ex.: nome) */
 .Profile p {
-  margin-top: 10px; /* Espaço acima do parágrafo */
+  margin: 12px 0 0 0; /* Espaço acima do parágrafo */
   font-weight: 600; /* Peso da fonte */
   color: #fff; /* padrão: branco (modo escuro) */
 }
@@ -319,9 +327,9 @@ h1 {
 @media (min-width: 1000px) {
   .Profiles .Profiles-list {
     grid-template-columns: repeat(
-      4,
+      var(--profile-cols, 4),
       1fr
-    ); /* 4 perfis alinhados lateralmente em desktops */
+    ); /* Perfis alinhados lateralmente em desktops */
     gap: 20px; /* Espaçamento confortável */
     max-width: 1200px; /* aumenta o max-width para aproveitar tela */
   }
@@ -334,9 +342,9 @@ h1 {
 @media (min-width: 1600px) {
   .Profiles .Profiles-list {
     grid-template-columns: repeat(
-      4,
+      var(--profile-cols, 4),
       1fr
-    ); /* Ainda 4 colunas, evita ficar muito denso */
+    ); /* Evita ficar muito denso */
     gap: 28px; /* Gap maior para telas à distância */
     max-width: 1400px; /* Limita largura para manter legibilidade */
   }
@@ -462,8 +470,34 @@ h1 {
 
 /* Light theme overrides */
 .theme-light body {
-  background-color: #111111 !important;
+  background-image: var(--bg-image);
+  background-color: #141414 !important;
   color: #111111 !important;
+}
+.theme-light main,
+.theme-light h1,
+.theme-light #profiles-title,
+.theme-light .Profile p {
+  color: #ffffff;
+}
+.theme-light .Profile img {
+  border-color: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+.theme-light .Profile.selected img {
+  border-color: #ffffff;
+  box-shadow: 0 14px 36px rgba(229, 9, 20, 0.35);
+}
+.theme-light .manage-profiles-btn,
+.theme-light .profiles-controls.below-profiles button {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.theme-light .manage-profiles-btn:hover,
+.theme-light .profiles-controls.below-profiles button:hover {
+  background: #e50914;
+  color: #ffffff;
+  border-color: #e50914;
 }
 .theme-light .navbar {
   background: linear-gradient(
@@ -471,9 +505,13 @@ h1 {
     rgba(255, 255, 255, 0.98),
     rgba(250, 250, 250, 0.96)
   );
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 .theme-light .nav-links a {
   color: #111;
+}
+.theme-light .nav-links a:hover {
+  color: #e50914;
 }
 .theme-light .brand {
   color: #e50914;
@@ -494,7 +532,13 @@ h1 {
 .theme-light .notification-card {
   background: #fff;
   color: #111;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.theme-light .notification-card-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+.theme-light .notification-list li {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 .theme-light .notification-card a {
   color: #111;
@@ -521,14 +565,38 @@ h1 {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.06);
 }
-.theme-light .Profile p {
-  color: #ffffff;
-}
 .theme-light .profiles-dropdown {
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #111111;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+.theme-light .profiles-dropdown-item div {
+  color: #111111;
 }
 .theme-light .profiles-dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.theme-light .profiles-modal {
+  background: #ffffff;
+  color: #111111;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+.theme-light .profiles-modal .profile-edit {
   background: rgba(0, 0, 0, 0.04);
+}
+.theme-light .profiles-modal .profile-edit input[type="text"] {
+  color: #111111;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+.theme-light .profiles-modal .btn {
+  color: #111111;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+.theme-light .profiles-modal .btn.primary {
+  background: #e50914;
+  border-color: #e50914;
+  color: #ffffff;
 }
 
 .navbar-left {
@@ -564,6 +632,8 @@ h1 {
   flex: 1;
   display: flex;
   justify-content: center;
+  min-width: 0;
+  padding: 0 16px;
 }
 
 .search-wrapper {
@@ -572,11 +642,12 @@ h1 {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 999px;
   padding: 6px 15px;
-  width: min(560px, 50%);
+  width: min(560px, 100%);
 }
 
 .search-input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   color: #fff;
@@ -628,10 +699,17 @@ h1 {
 
 /* Dropdown rápido exibido ao clicar no ícone do header */
 .profiles-dropdown {
+  background: rgba(15, 15, 15, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
   animation: fadeIn 180ms ease;
 }
+.profiles-dropdown-item div {
+  color: #ffffff;
+}
 .profiles-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
 }
 @keyframes fadeIn {
   from {

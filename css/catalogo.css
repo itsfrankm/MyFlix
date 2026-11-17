@@ -1,5 +1,6 @@
 :root {
   --Myflix-red: #e50914;
+  --netflix-red: #e50914;
   --dark-bg: #141414;
   --text-color: #ffffff;
 }
@@ -15,6 +16,9 @@ body {
   background-color: var(--dark-bg);
   color: var(--text-color);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -27,17 +31,26 @@ a:hover {
   color: #b3b3b3;
 }
 
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  min-width: 0;
+}
+
 .search-wrapper {
   display: flex;
   align-items: center;
   background: rgba(255, 255, 255, 0.06);
   border-radius: 999px;
-  padding: 8px 200px;
-  width: min(560px, 20%);
+  padding: 6px 16px;
+  width: min(420px, 100%);
 }
 
 .search-input {
   flex: 1;
+  min-width: 0;
   background: transparent;
   border: none;
   color: #fff;
@@ -63,7 +76,7 @@ a:hover {
     display: none;
   }
   .search-wrapper {
-    width: 65%;
+    width: 100%;
   }
 }
 
@@ -75,7 +88,7 @@ a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4%;
+  padding: 0;
   height: 70px;
   z-index: 1000;
   background-color: var(--dark-bg);
@@ -83,6 +96,16 @@ a:hover {
     background 0.4s ease,
     backdrop-filter 0.4s ease,
     box-shadow 0.4s ease;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .navbar.scrolled {
@@ -143,6 +166,7 @@ a:hover {
   display: inline-block;
 }
 .brand {
+  font-family: "Montserrat", "Roboto", sans-serif;
   color: var(--Myflix-red);
   font-weight: 800;
   font-size: 28px;
@@ -237,6 +261,20 @@ a:hover {
   font-weight: 700;
 }
 
+/* Dropdown de perfis (modo escuro padrão) */
+.profiles-dropdown {
+  background: rgba(15, 15, 15, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+.profiles-dropdown-item div {
+  color: #fff;
+}
+.profiles-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* Light theme overrides for catalog page */
 .theme-light .navbar {
   background: linear-gradient(
@@ -244,9 +282,29 @@ a:hover {
     rgba(255, 255, 255, 0.98),
     rgba(250, 250, 250, 0.96)
   );
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.theme-light .navbar.scrolled {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.06),
+    0 4px 20px rgba(0, 0, 0, 0.08);
 }
 .theme-light .nav-links a {
   color: #111;
+}
+.theme-light .nav-links a:hover {
+  color: #e50914;
+}
+.theme-light .nav-links .active {
+  color: #e50914;
+  font-weight: 700;
+}
+.theme-light .kids-link {
+  color: #111111;
+  font-weight: 600;
 }
 .theme-light .search-wrapper {
   background: rgba(0, 0, 0, 0.08);
@@ -262,6 +320,9 @@ a:hover {
 .theme-light .theme-toggle {
   color: #111;
 }
+.theme-light .profile-menu .fa-caret-down {
+  color: rgba(0, 0, 0, 0.75);
+}
 .theme-light .navbar-right-pill {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.06);
@@ -270,20 +331,30 @@ a:hover {
   border: 2px solid rgba(0, 0, 0, 0.08);
 }
 .theme-light .profiles-dropdown {
-  background: #fff;
-  color: #111;
-  border-color: rgba(0, 0, 0, 0.06);
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+.theme-light .profiles-dropdown-item div {
+  color: #111111;
 }
 .theme-light .profiles-dropdown-item:hover {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.05);
 }
-
-/* Ensure dropdown profile names are always visible on dark bg */
-.profiles-dropdown {
-  color: #fff;
+.theme-light .notification-card {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
-.profiles-dropdown-item div {
-  color: #fff;
+.theme-light .notification-card-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+.theme-light .notification-list li {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+.theme-light .notification-card-footer a {
+  color: #111111;
 }
 
 .profile-menu {
@@ -291,6 +362,11 @@ a:hover {
   align-items: center;
   gap: 5px;
   cursor: pointer;
+}
+.profile-menu .fa-caret-down {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s;
 }
 
 .profile-icon {
@@ -306,7 +382,7 @@ a:hover {
 .sliders-container {
   /* center the main content and act as the page limiter */
   max-width: 1200px;
-  margin: 100px auto 100px auto; /* top spacing for navbar */
+  margin: 90px auto 60px auto; /* top spacing for navbar */
   padding: 0 20px; /* inner gutter */
   position: relative;
   z-index: 3;
@@ -315,7 +391,11 @@ a:hover {
 /* Hero section (large showcase above the first carousel) */
 .hero-section {
   width: 100%;
-  height: 460px;
+  min-height: 460px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  padding: 36px 0;
   position: relative;
   margin-bottom: 28px;
   border-radius: 12px;
@@ -342,11 +422,12 @@ a:hover {
   color: #ffffff;
 }
 .hero-title {
-  font-size: 6rem;
-  line-height: 0.9;
+  font-family: "Montserrat", "Roboto", sans-serif;
+  font-size: clamp(2.2rem, 4.5vw, 4rem);
+  line-height: 1.02;
   margin: 0 0 12px 0;
   font-weight: 900;
-  letter-spacing: -2px;
+  letter-spacing: -0.5px;
 }
 .hero-meta {
   color: rgba(255, 255, 255, 0.8);
@@ -396,18 +477,19 @@ a:hover {
 
 @media (max-width: 900px) {
   .hero-section {
-    height: 320px;
+    min-height: 320px;
+    padding: 24px 0;
   }
   .hero-title {
-    font-size: 3.2rem;
+    font-size: clamp(1.7rem, 5vw, 2.6rem);
   }
   .hero-text {
-    margin-left: 4%;
+    margin: 0 4%;
   }
 }
 
-slider-section {
-  margin-bottom: 8px;
+.slider-section {
+  margin-bottom: 24px;
   overflow: visible; /* allow card details to extend outside the row */
 }
 
@@ -419,10 +501,11 @@ slider-section {
 }
 
 .slider-title {
-  font-size: 1.25vw;
+  font-family: "Montserrat", "Roboto", sans-serif;
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
   font-weight: bold;
   color: #e5e5e5;
-  line-height: 1.25vw;
+  line-height: 1.2;
 }
 
 .slider-indicators {
@@ -445,10 +528,11 @@ slider-section {
   display: flex;
   gap: 22px;
   overflow-x: auto;
-  overflow-y: visible; /* ensure vertical overflow (details) is visible */
-  padding: 18px 0 30px 0;
+  overflow-y: hidden;
+  padding: 12px 0 20px 0;
   margin: 0;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  overscroll-behavior: contain;
   -ms-overflow-style: none;
   scrollbar-width: none;
   justify-content: flex-start;
@@ -462,6 +546,7 @@ slider-section {
   /* responsive card size: scales between mobile and large desktop
          increased max width so cards are visually larger while respecting
          the centered page limiter; uses aspect-ratio to avoid distortion */
+  flex-shrink: 0;
   min-width: 210px;
   width: clamp(260px, 22vw, 420px);
   aspect-ratio: 8 / 5;
@@ -469,10 +554,8 @@ slider-section {
   border-radius: 6px;
   cursor: pointer;
   transition:
-    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s,
-    border-radius 0.3s 0s,
-    z-index 0s 0.3s,
-    box-shadow 0.3s 0s;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
   position: relative;
   z-index: 1;
   transform-origin: center center;
@@ -489,16 +572,8 @@ slider-section {
 }
 
 .movie-card:hover {
-  transform: scale(1.45) translateY(-6%);
-  /* Reduced vertical translation since container has more padding */
-  z-index: 9999; /* bring fully above siblings */
-  border-radius: 6px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-  transition:
-    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s,
-    border-radius 0.3s 0.6s,
-    box-shadow 0.3s 0.6s,
-    z-index 0s 0s;
+  z-index: 2;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
 }
 
 .movie-card img {
@@ -554,44 +629,13 @@ slider-section {
   border-radius: 6px 6px 0 0;
 }
 
-.movie-card:hover img {
-  border-radius: 6px 6px 0 0;
-  transition: border-radius 0s 0.6s;
-}
-
 .movie-card img.playing-video {
   opacity: 0;
 }
 
-/* Card Details Modal */
+/* Card Details Modal (usado como template para .movie-overlay) */
 .card-details {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: #181818;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-  padding: 18px 16px;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 0.3s 0s,
-    visibility 0.3s 0s;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10000; /* ensure the details overlay */
-  cursor: default;
-}
-
-.movie-card:hover .card-details {
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 0.2s 0.6s,
-    visibility 0s 0.6s;
+  display: none;
 }
 
 /* Floating overlay styles: when we render expanded card outside the
@@ -875,8 +919,8 @@ slider-section {
   }
 
   .slider-title {
-    font-size: 4vw;
-    line-height: 4.5vw;
+    font-size: clamp(1rem, 3.8vw, 1.25rem);
+    line-height: 1.2;
   }
 }
 
@@ -897,9 +941,51 @@ slider-section {
 .theme-light .slider-title {
   color: #111;
 }
-.theme-light .notification-card {
-  background: #fff;
-  color: #111;
+.theme-light .slider-indicators div {
+  background-color: rgba(0, 0, 0, 0.18);
+}
+.theme-light .slider-indicators div.active {
+  background-color: #111111;
+}
+.theme-light .welcome-toast {
+  background: rgba(255, 255, 255, 0.95);
+  color: #111111;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+.theme-light .movie-overlay .overlay-card {
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.theme-light .movie-overlay .overlay-details {
+  background-color: #ffffff;
+  color: #111111;
+}
+.theme-light .movie-overlay .overlay-details .card-title {
+  color: #111111;
+}
+.theme-light .movie-overlay .duration,
+.theme-light .movie-overlay .resolution,
+.theme-light .movie-overlay .details-tags,
+.theme-light .movie-overlay .age-badge {
+  color: #222222;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+.theme-light .movie-overlay .age-badge.red-accent {
+  color: #ffffff;
+}
+.theme-light .movie-overlay .match-score {
+  color: #1f9d45;
+}
+.theme-light .movie-overlay .btn-icon {
+  background-color: #f0f0f0;
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #111111;
+}
+.theme-light .movie-overlay .btn-play-icon {
+  background-color: #111111;
+  color: #ffffff;
+  border: none;
 }
 
 /* Footer */

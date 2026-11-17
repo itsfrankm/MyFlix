@@ -1,148 +1,150 @@
 <!doctype html>
-<!-- Declara o tipo de documento HTML5 -->
-<html lang="PT-BR">
-  <!-- Abre o elemento raiz com atributo de linguagem -->
+<html lang="pt-BR">
   <head>
-    <!-- Metadado: conjunto de caracteres do documento -->
     <meta charset="UTF-8" />
-    <!-- Metadado: configura viewport para responsividade em dispositivos móveis -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Título exibido na aba do navegador -->
     <title>MyFlix</title>
-    <!-- Link para o arquivo de estilos principal do projeto -->
-    <link rel="stylesheet" href="Styles.css" />
+    <link id="page-stylesheet" rel="stylesheet" href="css/profiles.css" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <!-- Corpo do documento inicia aqui -->
-    <header class="navbar" aria-label="Cabeçalho do site">
-      <div class="container">
-        <div class="navbar-left">
-          <a href="index.html" class="brand">MYFLIX</a>
-          <nav>
-            <ul class="nav-links">
-              <li><a href="#">Início</a></li>
-              <li><a href="#">Séries</a></li>
-              <li><a href="#">Filmes</a></li>
-              <li><a href="#">Populares</a></li>
-              <li><a href="#">Minha lista</a></li>
-            </ul>
-          </nav>
-        </div>
+    <div id="app-root"></div>
 
-        <div class="navbar-center">
-          <div class="search-wrapper">
-            <input
-              class="search-input"
-              type="search"
-              placeholder="Buscar perfis"
-              aria-label="Buscar"
-            />
-            <button class="search-button" aria-label="Buscar">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
+    <script type="module">
+      import { initProfilesPage } from "./js/profiles.js";
+      import { initCatalogPage } from "./js/catalogo.js";
 
-        <div class="navbar-right">
-          <span class="kids-link">Convidado</span>
+      window.__MYFLIX_APP__ = true;
 
-          <div
-            class="nav-notification"
-            role="button"
-            tabindex="0"
-            aria-expanded="false"
-            aria-label="Notificações"
-          >
-            <i class="fas fa-bell icon"></i>
-            <span class="notification-badge">3</span>
-            <div class="notification-card" aria-hidden="true">
-              <div class="notification-card-header">
-                <strong>Notificações</strong>
-              </div>
-              <ul class="notification-list">
-                <li>🎁 Bem-vindo ao MyFlix!</li>
-                <li>🔔 Novo episódio disponível</li>
-                <li>⭐ Recomendação: Forrest Gump</li>
-              </ul>
-              <div class="notification-card-footer">
-                <a href="#">Ver todas</a>
-              </div>
-            </div>
-          </div>
+      const VIEWS = {
+        profiles: {
+          html: "pages/profiles.html",
+          css: "css/profiles.css",
+          init: initProfilesPage,
+        },
+        catalogo: {
+          html: "pages/catalogo.html",
+          css: "css/catalogo.css",
+          init: initCatalogPage,
+        },
+      };
 
-          <button
-            class="theme-toggle"
-            aria-label="Alternar tema"
-            title="Alternar tema"
-          >
-            <i class="fas fa-moon"></i>
-          </button>
+      const appRoot = document.getElementById("app-root");
+      const pageStylesheet = document.getElementById("page-stylesheet");
+      const htmlCache = new Map();
+      let activeController = null;
+      let currentView = null;
 
-          <button
-            class="profile-menu"
-            title="Perfil"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <img
-              class="profile-icon"
-              src="pictures/Convidado.jpg"
-              alt="Profile"
-            />
-          </button>
-        </div>
-      </div>
-    </header>
-    <main>
-      <!-- Conteúdo principal da página -->
-      <h2 id="profiles-title">Quem está assistindo?</h2>
-      <!-- Título da seção de perfis com ID para ligação -->
-      <!-- Lista não ordenada que contém uma lista ordenada de perfis
-           Estrutura semântica: ul (container) > li (grupo) > ol (perfis ordenados) -->
-      <ul class="Profiles" aria-labelledby="profiles-title">
-        <li class="Profiles-group">
-          <ol class="Profiles-list">
-            <li class="Profile">
-              <figure>
-                <a href="catalogo/catalogo.html" class="profile-link">
-                  <img src="pictures/Image 1.png" alt="Tony" />
-                </a>
-                <p>Tony</p>
-              </figure>
-            </li>
-            <li class="Profile">
-              <figure>
-                <a href="catalogo/catalogo.html" class="profile-link">
-                  <img src="pictures/Image 2.jpg" alt="Thor" />
-                </a>
-                <p>Thor</p>
-              </figure>
-            </li>
-            <li class="Profile">
-              <figure>
-                <a href="catalogo/catalogo.html" class="profile-link">
-                  <img src="pictures/Image 3.jpg" alt="Natasha" />
-                </a>
-                <p>Natasha</p>
-              </figure>
-            </li>
-            <li class="Profile">
-              <figure>
-                <a href="catalogo/catalogo.html" class="profile-link">
-                  <img src="pictures/Convidado.jpg" alt="Convidado" />
-                </a>
-                <p>Convidado</p>
-              </figure>
-            </li>
-          </ol>
-        </li>
-      </ul>
-      <div class="profiles-controls below-profiles"></div>
-    </main>
-    <script src="catalogo/js/index.js"></script>
+      function cleanupTransientUI() {
+        document
+          .querySelectorAll(
+            ".profiles-dropdown, .movie-overlay, .welcome-toast, .profiles-modal-overlay",
+          )
+          .forEach((el) => el.remove());
+      }
+
+      function loadStylesheet(href) {
+        return new Promise((resolve) => {
+          const currentHref = pageStylesheet.getAttribute("href");
+          if (currentHref === href && pageStylesheet.sheet) {
+            resolve();
+            return;
+          }
+          let done = false;
+          const finish = () => {
+            if (done) return;
+            done = true;
+            resolve();
+          };
+          pageStylesheet.addEventListener("load", finish, { once: true });
+          pageStylesheet.addEventListener("error", finish, { once: true });
+          if (currentHref !== href) {
+            pageStylesheet.setAttribute("href", href);
+          }
+          setTimeout(finish, 400);
+        });
+      }
+
+      async function fetchViewMarkup(url) {
+        if (htmlCache.has(url)) return htmlCache.get(url);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Falha ao carregar ${url}: ${res.status}`);
+        const text = await res.text();
+        const doc = new DOMParser().parseFromString(text, "text/html");
+        doc.querySelectorAll("script").forEach((s) => s.remove());
+        // Converte caminhos relativos de ../assets/ para assets/ ao montar na raiz
+        doc.querySelectorAll("[src]").forEach((el) => {
+          const src = el.getAttribute("src");
+          if (src && src.startsWith("../assets/")) {
+            el.setAttribute("src", src.slice(3));
+          }
+        });
+        const markup = doc.body.innerHTML;
+        htmlCache.set(url, markup);
+        return markup;
+      }
+
+      async function renderView(viewName, { pushHistory = true } = {}) {
+        const view = VIEWS[viewName] || VIEWS.profiles;
+        const resolvedName = VIEWS[viewName] ? viewName : "profiles";
+
+        if (activeController) {
+          activeController.abort();
+          activeController = null;
+        }
+        cleanupTransientUI();
+
+        const [markup] = await Promise.all([
+          fetchViewMarkup(view.html),
+          loadStylesheet(view.css),
+        ]);
+
+        appRoot.innerHTML = markup;
+        currentView = resolvedName;
+        sessionStorage.setItem("myflix_view", resolvedName);
+
+        if (pushHistory) {
+          history.pushState(
+            { view: resolvedName },
+            "",
+            window.location.pathname,
+          );
+        }
+
+        activeController = new AbortController();
+        view.init(activeController.signal);
+        window.scrollTo(0, 0);
+      }
+
+      window.__MYFLIX_NAVIGATE__ = (viewName) =>
+        renderView(viewName, { pushHistory: true });
+
+      window.addEventListener("popstate", (e) => {
+        const targetView =
+          (e.state && e.state.view) ||
+          sessionStorage.getItem("myflix_view") ||
+          "profiles";
+        if (targetView !== currentView) {
+          renderView(targetView, { pushHistory: false });
+        }
+      });
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("theme-light");
+      }
+
+      const initialView = sessionStorage.getItem("myflix_view") || "profiles";
+      history.replaceState({ view: initialView }, "", window.location.pathname);
+      renderView(initialView, { pushHistory: false });
+    </script>
   </body>
 </html>
+
